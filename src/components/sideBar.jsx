@@ -9,18 +9,34 @@ import {
   Moon,
   Sun,
 } from "lucide-react";
-import { useAppStore } from "../store/useAppStore";
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
-  const { darkTheme, toggledarkTheme } = useAppStore();
 
   const navItems = [
     { name: "home", icon: <LayoutDashboard />, path: "/" },
     { name: "tasks", icon: <ClipboardList />, path: "/TasksBoard" },
     { name: "chat", icon: <MessageCircleMore />, path: "/ChatPage" },
   ];
+
+  const [isDark, setIsDark] = useState(
+    localStorage.theme === "dark" ||
+      (!("theme" in localStorage) &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
+  );
+
+  const toggleTheme = () => {
+    if (isDark) {
+      document.documentElement.classList.remove("dark");
+      localStorage.theme = "light";
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.theme = "dark";
+      setIsDark(true);
+    }
+  };
 
   return (
     <>
@@ -88,10 +104,10 @@ const Sidebar = () => {
             </Link>
 
             <button
-              onClick={toggledarkTheme}
+              onClick={toggleTheme}
               className="flex items-center gap-2 px-4 py-2 bg-zinc-200 dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl hover:opacity-80"
             >
-              {darkTheme ? <Sun size={18} /> : <Moon size={18} />}
+              {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
           </div>
         </nav>
