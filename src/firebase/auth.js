@@ -4,6 +4,8 @@ import { db } from "./firebaseConfig";
 
 // login 
 export const loginLogic = () => {
+  sessionStorage.setItem("justRedirected", "true");
+  console.log("👉 redirecting to Google login");
   const provider = new GoogleAuthProvider();
   const auth = getAuth();
   signInWithRedirect(auth , provider);

@@ -17,6 +17,5 @@ const db = getFirestore(app)
 
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-signInWithRedirect(auth,provider);
 
 export { auth, provider, db ,firebaseConfig };
