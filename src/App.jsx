@@ -6,9 +6,12 @@ import TasksBoard from "./pages/TasksBoard";
 import Profile from "./pages/Profile";
 import ChatPage from "./pages/ChatPage";
 import { authListner } from "./firebase/authListner";
+import { getRedirectResult, signInWithPopup } from "firebase/auth";
+import { Toaster } from "react-hot-toast";
+
+import { db, auth, provider } from "../src/firebase/firebaseConfig";
 
 const App = () => {
-
   useEffect(() => {
     const unsubscribe = authListner();
     console.log("Auth listener mounted");
@@ -17,6 +20,21 @@ const App = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-white dark:bg-zinc-900 transition-colors duration-300">
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: "#333",
+            color: "#fff",
+          },
+          success: {
+            iconTheme: {
+              primary: "green",
+              secondary: "white",
+            },
+          },
+        }}
+      />
       <Sidebar />
       <div className="flex-grow p-4 md:p-6 overflow-y-auto text-gray-900 dark:text-gray-100">
         <Routes>
