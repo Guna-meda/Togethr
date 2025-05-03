@@ -10,6 +10,7 @@ import { getRedirectResult, signInWithPopup } from "firebase/auth";
 import { Toaster } from "react-hot-toast";
 
 import { db, auth, provider } from "../src/firebase/firebaseConfig";
+import Teams from "./pages/Teams";
 
 const App = () => {
   useEffect(() => {
@@ -42,6 +43,8 @@ const App = () => {
           <Route path="/TasksBoard" element={<TasksBoard />} />
           <Route path="/Profile" element={<Profile />} />
           <Route path="/ChatPage" element={<ChatPage />} />
+          <Route path="/Teams" element={<Teams />} />
+
         </Routes>
       </div>
     </div>

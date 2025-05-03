@@ -8,6 +8,7 @@ import {
   CircleUserRound,
   Moon,
   Sun,
+  Users,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -16,6 +17,7 @@ const Sidebar = () => {
 
   const navItems = [
     { name: "home", icon: <LayoutDashboard />, path: "/" },
+    { name: "teams", icon: <Users />, path: "/Teams" },
     { name: "tasks", icon: <ClipboardList />, path: "/TasksBoard" },
     { name: "chat", icon: <MessageCircleMore />, path: "/ChatPage" },
   ];
