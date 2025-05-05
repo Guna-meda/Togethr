@@ -7,9 +7,14 @@ export const authListner = () => {
   const auth = getAuth();
   const setUser = useUserStore.getState().setUser;
   const clearUser = useUserStore.getState().clearUser;
+  const setAuthLoading = useUserStore.getState().setAuthLoading;
 
   return onAuthStateChanged(auth, async (user) => {
-    if (!user) return clearUser();
+    if (!user) {
+      clearUser();
+      setAuthLoading(false);
+      return;
+    }
     const docRef = doc(db, "users", user.uid);
     const docSnap = await getDoc(docRef);
 
@@ -19,5 +24,6 @@ export const authListner = () => {
       console.warn("User logged in but no Firestore data found.");
       clearUser();
     }
+    setAuthLoading(false);
   });
 };

@@ -16,7 +16,7 @@ const Profile = () => {
   const user = useUserStore((s) => s.user);
   const updateUser = useUserStore((s) => s.updateUser);
   const setUser = useUserStore((state) => state.setUser);
-  const [loading, setLoading] = useState(true);
+  const {authLoading } = useUserStore()
 
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
@@ -148,19 +148,14 @@ const Profile = () => {
     }
   };
 
-  useEffect(() => {
-    if (user !== null) {
-      setLoading(false);
-    }
-  }, [user]);
 
-  if (loading) {
-    return (
-      <div className="text-center mt-10">
-        <div className="spinner mx-auto"></div>
-      </div>
-    );
-  }
+if (authLoading) {
+  return (
+    <div className="text-center mt-10">
+      <div className="spinner mx-auto"></div>
+    </div>
+  );
+}
   
 
   if (user === null) {

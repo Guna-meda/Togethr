@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect,useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Sidebar from "./components/sideBar";
 import Dashboard from "./pages/Dashboard";
@@ -13,6 +13,7 @@ import { db, auth, provider } from "../src/firebase/firebaseConfig";
 import Teams from "./pages/Teams";
 
 const App = () => {
+
   useEffect(() => {
     const unsubscribe = authListner();
     console.log("Auth listener mounted");
