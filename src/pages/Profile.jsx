@@ -158,55 +158,60 @@ if (authLoading) {
 }
   
 
-  if (user === null) {
-    return (
-      <div className="text-center mt-10 space-y-4">
-        <h2>Please log in to view and edit your profile.</h2>
+if (user === null) {
+  return (
+    <div className="flex justify-center mt-10 px-4">
+      <div className="w-full max-w-md bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg space-y-6">
+        <h2 className="text-2xl font-bold text-center">Welcome</h2>
+        <p className="text-sm text-center text-gray-500 dark:text-gray-400">
+          Please log in or sign up to access your profile.
+        </p>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={authForm.email}
-          onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
-          className="w-full p-2 border rounded-md dark:bg-zinc-700 dark:text-white"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={authForm.password}
-          onChange={(e) =>
-            setAuthForm({ ...authForm, password: e.target.value })
-          }
-          className="w-full p-2 border rounded-md dark:bg-zinc-700 dark:text-white"
-        />
-        <input
-          type="text"
-          name="name"
-          placeholder="Name (for sign up)"
-          value={authForm.name}
-          onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
-          className="w-full p-2 border rounded-md dark:bg-zinc-700 dark:text-white"
-        />
+        <div className="space-y-4">
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={authForm.email}
+            onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
+            className="w-full p-2 border rounded-md bg-gray-50 dark:bg-zinc-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={authForm.password}
+            onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+            className="w-full p-2 border rounded-md bg-gray-50 dark:bg-zinc-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+          <input
+            type="text"
+            name="name"
+            placeholder="Name (for sign up)"
+            value={authForm.name}
+            onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
+            className="w-full p-2 border rounded-md bg-gray-50 dark:bg-zinc-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+        </div>
 
-        <div className="flex justify-center gap-4 mt-2">
+        <div className="flex justify-between gap-4 mt-4">
           <button
             onClick={handleLogin}
-            className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg transition"
           >
             Login
           </button>
           <button
             onClick={handleSignUp}
-            className="bg-green-600 text-white px-5 py-2 rounded-lg"
+            className="w-full bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg transition"
           >
             Sign Up
           </button>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <div className="max-w-xl mx-auto mt-10 bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-md">
@@ -268,6 +273,11 @@ if (authLoading) {
           <div className="flex gap-4 mt-4">
             <button
               onClick={handleSave}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSave();
+                }
+              }}
               className="bg-green-600 text-white px-4 py-2 rounded-md"
             >
               Save

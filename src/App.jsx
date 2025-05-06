@@ -11,6 +11,8 @@ import { Toaster } from "react-hot-toast";
 
 import { db, auth, provider } from "../src/firebase/firebaseConfig";
 import Teams from "./pages/Teams";
+import TeamPage from "./components/TeamPage";
+import TeamWrapper from "./pages/TeamWrapper";
 
 const App = () => {
 
@@ -45,6 +47,7 @@ const App = () => {
           <Route path="/Profile" element={<Profile />} />
           <Route path="/ChatPage" element={<ChatPage />} />
           <Route path="/Teams" element={<Teams />} />
+          <Route path="/teams/:id" element={<TeamWrapper />} />
 
         </Routes>
       </div>
