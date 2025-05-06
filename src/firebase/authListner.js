@@ -19,7 +19,7 @@ export const authListner = () => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      setUser(docSnap.data());
+      setUser({uid:user.uid , ...docSnap.data()});
     } else {
       console.warn("User logged in but no Firestore data found.");
       clearUser();
