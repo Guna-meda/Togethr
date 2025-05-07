@@ -12,9 +12,12 @@ export const createTeam = async (name , bio , creatorUid) => {
     bio,
     inviteCode,
     members: [creatorUid],
+    memberIds: [creatorUid],
+    createdAt: Date.now(),
   };
 
   await setDoc(newTeamRef ,teamData);
+
   return {id: newTeamRef.id , ...teamData}
 }
 

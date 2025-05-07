@@ -3,6 +3,7 @@ import { create } from "zustand";
 export const useUserStore = create((set) => ({
   user: null,
   authLoading: true,
+  teams: [],
   setUser: (userData) => set({ user: userData }),
   clearUser: () => set({ user: null }),
   updateUser: (partialData) =>
@@ -10,4 +11,5 @@ export const useUserStore = create((set) => ({
       user: { ...state.user, ...partialData },
     })),
   setAuthLoading: (loading) => set({ authLoading: loading }),
+  setTeams: (teams) => set({ teams }),
 }));

@@ -153,7 +153,7 @@ const Teams = () => {
 
           <div
             onClick={() => setShowJoinModal(true)}
-            className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-md cursor-pointer hover:ring-2 ring-green-500 transition"
+            className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-md cursor-pointer hover:ring-2 ring-blue-500 transition"
           >
             <h2 className="text-xl font-semibold mb-2">Join a Team</h2>
             <p className="text-sm text-gray-500 dark:text-gray-300">
@@ -183,7 +183,7 @@ const Teams = () => {
       </p>
       <div className="text-xs text-gray-500 dark:text-gray-400">
         <span className="font-medium">Invite Code:</span>{" "}
-        <code className="bg-gray-100 dark:bg-zinc-700 px-1 py-0.5 rounded">
+        <code onClick={(e) => e.stopPropagation()} className="bg-gray-100 dark:bg-zinc-700 px-1 py-0.5 rounded">
           {team.inviteCode}
         </code>
       </div>

@@ -1,23 +1,35 @@
 import { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { createTask, deleteTask, listenToTask, updateTask } from "../firebase/tasks";
+import {
+  createTask,
+  deleteTask,
+  getUserByIds,
+  listenToTask,
+  updateTask,
+} from "../firebase/tasks";
 import { Trash2 } from "lucide-react";
 import { InlineEditTask } from "./InLine";
+import SettingsPanel from "../pages/SettingsPanel";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
+import toast from "react-hot-toast";
+import { useNavigate, useLocation } from "react-router-dom";
 
-const mockTeam = {
-  name: "Cloud Warriors",
-  bio: "A team conquering Firebase one bug at a time.",
-  inviteCode: "abc123",
-};
-
-const TeamPage = ({ team = mockTeam  ,teamId}) => {
-  const [selectedTab, setSelectedTab] = useState("Tasks");
-  const tabs = ["Tasks", "Members", "Info", "Activity"];
+const TeamPage = ({ team = mockTeam, teamId }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
+  const currentTab = searchParams.get("tab") || "Tasks";
+  const [selectedTab, setSelectedTab] = useState(currentTab);
+  const tabs = ["Tasks", "Members", "Activity", "Settings"];
   const [tasks, setTasks] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("todo");
+  const [teamm, setTeamm] = useState(null);
+  const [teamMembers, setTeamMembers] = useState(null);
+ 
 
   useEffect(() => {
     if (!team?.id) return;
@@ -25,6 +37,20 @@ const TeamPage = ({ team = mockTeam  ,teamId}) => {
     const unsub = listenToTask(team.id, setTasks);
     return () => unsub();
   }, [team?.id]);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      if (team?.memberIds) {
+        const members = await getUserByIds(team.memberIds);
+        setTeamMembers(members);
+      }
+    };
+    fetchMembers();
+  }, [team?.memberIds]);
+
+  useEffect(() => {
+    setSelectedTab(currentTab);
+  }, [currentTab]);
 
   const addTask = async () => {
     if (!team?.id || !title.trim()) return;
@@ -47,7 +73,9 @@ const TeamPage = ({ team = mockTeam  ,teamId}) => {
         {tabs.map((tab) => (
           <button
             key={tab}
-            onClick={() => setSelectedTab(tab)}
+            onClick={() => {
+              navigate(`?tab=${tab}`);
+            }}
             className={`pb-2 border-b-2 font-medium text-sm transition-colors ${
               selectedTab === tab
                 ? "border-blue-500 text-blue-500"
@@ -94,7 +122,6 @@ const TeamPage = ({ team = mockTeam  ,teamId}) => {
                               />
 
                               <div className="flex gap-2 items-center">
-                               
                                 <button
                                   onClick={() => deleteTask(teamId, task.id)}
                                   className="text-red-500 hover:text-red-300"
@@ -176,53 +203,22 @@ const TeamPage = ({ team = mockTeam  ,teamId}) => {
         )}
 
         {selectedTab === "Members" && (
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-4">
+          <div className="bg-zinc-800 p-4 rounded-lg mt-6">
+            <h3 className="text-lg font-semibold text-blue-400 mb-3">
               Team Members
-            </h2>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {[
-                { name: "Arjun R", role: "Owner", joined: "Apr 2025" },
-                { name: "Neha K", role: "Member", joined: "May 2025" },
-              ].map((member, idx) => (
-                <div
-                  key={idx}
-                  className="bg-gray-700 border border-gray-600 rounded-md p-4 text-sm"
-                >
-                  <div className="font-medium text-white">{member.name}</div>
-                  <div className="text-gray-400 text-xs mt-1">
-                    {member.role} • Joined: {member.joined}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {selectedTab === "Info" && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-white mb-2">Team Info</h2>
-            <p className="text-gray-400">
-              <span className="font-medium text-white">Name:</span> {team.name}
-            </p>
-            <p className="text-gray-400">
-              <span className="font-medium text-white">Description:</span>{" "}
-              {team.bio}
-            </p>
-            <p className="text-gray-400">
-              <span className="font-medium text-white">Invite Code:</span>{" "}
-              <code className="bg-gray-600 px-2 py-1 rounded text-sm text-gray-100">
-                {team.inviteCode}
-              </code>
-            </p>
-            <div className="flex gap-3 pt-3">
-              <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md text-sm">
-                Edit
-              </button>
-              <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm">
-                Delete Team
-              </button>
-            </div>
+            </h3>
+            {teamMembers ? (
+              <ul className="space-y-2 text-sm text-gray-200">
+                {teamMembers.map((member) => (
+                  <li key={member.id} className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full" />
+                    {member.name || member.email}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-400 italic">Loading members...</p>
+            )}
           </div>
         )}
 
@@ -240,6 +236,20 @@ const TeamPage = ({ team = mockTeam  ,teamId}) => {
               <li>• Arjun updated team description</li>
             </ul>
           </div>
+        )}
+
+        {selectedTab === "Settings" && (
+          <SettingsPanel
+            team={team}
+            onEdit={async (updates) => {
+              await updateDoc(doc(db, "teams", team.id), updates);
+              toast.success("Team updated");
+            }}
+            onDelete={async () => {
+              await deleteDoc(doc(db, "teams", team.id));
+              toast.success("Team deleted");
+              navigate("/Teams");            }}
+          />
         )}
       </div>
     </div>

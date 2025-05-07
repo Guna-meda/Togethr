@@ -1,10 +1,10 @@
-import { addDoc, collection, deleteDoc, doc, onSnapshot, orderBy, query, updateDoc} from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query, updateDoc} from "firebase/firestore"
 import { db } from "./firebaseConfig"
 
 export const createTask = async (teamId , taskData) => {
 const taskRef= collection(db, "teams" ,teamId ,  "tasks" )
 const newTask= await addDoc(taskRef , {
-  ...taskData , timestamp : Date.now()
+  ...taskData ,timestamp: serverTimestamp(),
 })
 return newTask.id;
 };
@@ -31,4 +31,17 @@ export const updateTask = async(teamId ,taskId ,updates) => {
 export const deleteTask = async (teamId , taskId) => {
   const taskRef = doc(db , "teams" , teamId , "tasks" , taskId)
   await deleteDoc(taskRef)
+}
+
+// change this bs logic if u ever had to scale . scale?lol
+export const getUserByIds = async(userIds) => {
+  const users =[]
+  for (const uid of userIds) {
+    const userRef = doc(db, "users", uid); 
+    const userdoc = await getDoc(userRef);  
+      if(userdoc.exists()) {
+      users.push({ id: uid, ...userdoc.data() });
+    }
+  }
+  return users
 }
