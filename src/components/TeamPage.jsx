@@ -15,7 +15,7 @@ import { db } from "../firebase/firebaseConfig";
 import toast from "react-hot-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const TeamPage = ({ team = mockTeam, teamId }) => {
+const TeamPage = ({ team, teamId }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
@@ -29,7 +29,7 @@ const TeamPage = ({ team = mockTeam, teamId }) => {
   const [status, setStatus] = useState("todo");
   const [teamm, setTeamm] = useState(null);
   const [teamMembers, setTeamMembers] = useState(null);
- 
+  const [teamData, setTeamData] = useState(team);
 
   useEffect(() => {
     if (!team?.id) return;
@@ -37,6 +37,10 @@ const TeamPage = ({ team = mockTeam, teamId }) => {
     const unsub = listenToTask(team.id, setTasks);
     return () => unsub();
   }, [team?.id]);
+
+  useEffect(() => {
+    setTeamData(team);
+  }, [team]);
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -65,8 +69,8 @@ const TeamPage = ({ team = mockTeam, teamId }) => {
   return (
     <div className="max-w-7xl mx-auto px-6 py-10 text-gray-100 ">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-white">{team.name}</h1>
-        <p className="text-gray-400 mt-2 text-base">{team.bio}</p>
+        <h1 className="text-4xl font-bold text-white">{teamData?.name}</h1>
+        <p className="text-gray-400 mt-2 text-base">{teamData?.bio}</p>
       </div>
 
       <div className="flex gap-6 border-b border-gray-600 mb-8">
@@ -240,15 +244,17 @@ const TeamPage = ({ team = mockTeam, teamId }) => {
 
         {selectedTab === "Settings" && (
           <SettingsPanel
-            team={team}
+            team={teamData}
             onEdit={async (updates) => {
               await updateDoc(doc(db, "teams", team.id), updates);
+              setTeamData((prev) => ({ ...prev, ...updates }));
               toast.success("Team updated");
             }}
             onDelete={async () => {
               await deleteDoc(doc(db, "teams", team.id));
               toast.success("Team deleted");
-              navigate("/Teams");            }}
+              navigate("/Teams");
+            }}
           />
         )}
       </div>

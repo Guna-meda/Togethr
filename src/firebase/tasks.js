@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query, updateDoc} from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query, updateDoc , getDocs} from "firebase/firestore"
 import { db } from "./firebaseConfig"
 
 export const createTask = async (teamId , taskData) => {
@@ -45,3 +45,24 @@ export const getUserByIds = async(userIds) => {
   }
   return users
 }
+
+export const getPersonalTasks = async (uid) => {
+  const q = query(collection(db, "users", uid, "tasks"));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+export const addPersonalTask = async (uid, task) => {
+  const docRef = await addDoc(collection(db, "users", uid, "tasks"), task);
+  return { id: docRef.id, ...task };
+};
+
+export const updatePersonalTask = async (uid, taskId, updates) => {
+  const docRef = doc(db, "users", uid, "tasks", taskId);
+  await updateDoc(docRef, updates);
+};
+
+export const deletePersonalTask = async (uid, taskId) => {
+  const docRef = doc(db, "users", uid, "tasks", taskId);
+  await deleteDoc(docRef);
+};

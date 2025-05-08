@@ -21,13 +21,11 @@ const SettingsPanel = ({ team, onEdit, onDelete }) => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-10 px-4 md:px-8 text-white">
-      {/* Header */}
       <div>
         <h2 className="text-2xl font-semibold mb-2">Team Settings</h2>
         <p className="text-gray-400 text-sm">Manage your team’s info and preferences</p>
       </div>
 
-      {/* Team Info Section */}
       <div className="bg-zinc-800 border border-zinc-700 rounded-md p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium text-blue-400">Team Info</h3>
@@ -93,7 +91,6 @@ const SettingsPanel = ({ team, onEdit, onDelete }) => {
         )}
       </div>
 
-      {/* Invite Code Section */}
       <div className="bg-zinc-800 border border-zinc-700 rounded-md p-6 space-y-2">
         <h3 className="text-lg font-medium text-blue-400">Invite Code</h3>
         <div className="flex items-center justify-between bg-zinc-700 px-4 py-2 rounded">
