@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import ChatPage from "./pages/ChatPage";
 import { authListner } from "./firebase/authListner";
 import { getRedirectResult, signInWithPopup } from "firebase/auth";
+import { useLoadUserTeams } from "./hooks/useLoadTeams";
 import { Toaster } from "react-hot-toast";
 
 import { db, auth, provider } from "../src/firebase/firebaseConfig";
@@ -21,6 +22,9 @@ const App = () => {
     console.log("Auth listener mounted");
     return () => unsubscribe();
     } , [])
+
+    useLoadUserTeams();
+
 
   return (
     <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-white dark:bg-zinc-900 transition-colors duration-300">

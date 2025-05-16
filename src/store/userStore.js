@@ -11,5 +11,5 @@ export const useUserStore = create((set) => ({
       user: { ...state.user, ...partialData },
     })),
   setAuthLoading: (loading) => set({ authLoading: loading }),
-  setTeams: (teams) => set({ teams }),
+  setTeamss: (teams) => set({ teams }),
 }));
