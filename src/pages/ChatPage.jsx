@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Send } from "lucide-react";
 import {
   addDoc,
   collection,
@@ -29,7 +29,6 @@ const ChatPage = () => {
 
   useEffect(() => {
     if (!selectedTeam) return;
-
     const q = query(
       collection(db, "teams", selectedTeamId, "messages"),
       orderBy("createdAt")
@@ -48,10 +47,11 @@ const ChatPage = () => {
 
   const handleSend = async () => {
     if (!message.trim()) return;
+    console.log("Sending as:", user.displayName);
 
     await addDoc(collection(db, "teams", selectedTeamId, "messages"), {
       text: message,
-      sender: user.displayName || "Anonymous",
+      sender: user.name || user.email?.split("@")[0] || "Anonymous",
       uid: user.uid,
       createdAt: serverTimestamp(),
     });
@@ -65,9 +65,16 @@ const ChatPage = () => {
     }
   };
 
+  if (!teams.length) {
+    return (
+      <div className="h-screen bg-zinc-900 text-white flex items-center justify-center">
+        <p className="text-lg text-gray-400">Join a team to view the chat.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen bg-zinc-900 text-white flex overflow-hidden">
-      {/* Sidebar: Team Selector */}
       <div className="w-full sm:w-1/4 bg-zinc-800 border-r border-zinc-700 p-4">
         <h2 className="text-lg font-semibold mb-4">Teams</h2>
         <ul className="space-y-2 overflow-y-auto max-h-[calc(100vh-5rem)]">
@@ -87,11 +94,9 @@ const ChatPage = () => {
         </ul>
       </div>
 
-      {/* Chat Window */}
       <div className="flex flex-col flex-1 h-full">
         {selectedTeam && (
           <>
-            {/* Header */}
             <div className="flex items-center p-4 bg-zinc-800 border-b border-zinc-700">
               <button
                 className="sm:hidden mr-2"
@@ -102,11 +107,12 @@ const ChatPage = () => {
               <h3 className="text-lg font-semibold">{selectedTeam.name}</h3>
             </div>
 
-            {/* Messages Section */}
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4 bg-zinc-900">
               {messages.length > 0 ? (
-                messages.map((msg) => {
+                messages.map((msg,index) => {
                   const isCurrentUser = msg.uid === user.uid;
+                  const previousMsg = messages[index - 1];
+                  const isSameSenderAsPrevious = previousMsg?.uid === msg.uid;
                   return (
                     <div
                       key={msg.id}
@@ -114,11 +120,13 @@ const ChatPage = () => {
                         isCurrentUser ? "ml-auto text-right" : "mr-auto"
                       }`}
                     >
-                      <p className="text-xs text-gray-400 mb-1">
-                        {msg.sender || "Anonymous"}
-                      </p>
+                      {!isCurrentUser && !isSameSenderAsPrevious && (
+                        <p className="text-xs text-gray-400 mb-1">
+                          {msg.sender}
+                        </p>
+                      )}
                       <div
-                        className={`p-3 rounded-lg text-sm shadow ${
+                        className={`p-3 rounded-lg text-sm shadow break-words inline-block ${
                           isCurrentUser
                             ? "bg-blue-600 text-white"
                             : "bg-zinc-700 text-white"
@@ -142,16 +150,23 @@ const ChatPage = () => {
               <div ref={messageEndRef} />
             </div>
 
-            {/* Input Section */}
             <div className="p-4 border-t border-zinc-700 bg-zinc-800">
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Type a message..."
-                rows={1}
-                className="w-full p-2 rounded-md bg-zinc-700 text-white resize-none"
-              />
+              <div className="flex items-center gap-2">
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Type a message..."
+                  rows={1}
+                  className="w-full p-2 rounded-md bg-zinc-700 text-white resize-none"
+                />
+                <button
+                  onClick={handleSend}
+                  className="p-2 rounded bg-blue-600 hover:bg-blue-700 transition"
+                >
+                  <Send className="w-6 h-6" />
+                </button>
+              </div>
             </div>
           </>
         )}
