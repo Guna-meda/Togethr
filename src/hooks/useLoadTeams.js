@@ -4,7 +4,7 @@ import { getTeamById } from "../firebase/teams";
 
 export const useLoadUserTeams = () => {
   const user = useUserStore((s) => s.user);
-  const setTeams = useUserStore((s) => s.setTeamss);
+  const setTeams = useUserStore((s) => s.setTeams);
 
   useEffect(() => {
     const load = async () => {

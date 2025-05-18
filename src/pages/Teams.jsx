@@ -3,7 +3,12 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import { useUserStore } from "../store/userStore";
-import { createTeam, getTeamById, joinTeam, updateForUser } from "../firebase/teams";
+import {
+  createTeam,
+  getTeamById,
+  joinTeam,
+  updateForUser,
+} from "../firebase/teams";
 
 const Teams = () => {
   const user = useUserStore((s) => s.user);
@@ -41,7 +46,7 @@ const Teams = () => {
 
     await updateForUser(user.uid, { teamIds: updatedIds });
     updateUser({ teamIds: updatedIds });
-    setTeams((prev) => [...prev, team]);
+    useUserStore.getState().setTeams([...useUserStore.getState().teams, team]);
 
     toast.success("Team created!");
     setShowCreateModal(false);
@@ -54,11 +59,15 @@ const Teams = () => {
 
     try {
       const team = await joinTeam(inviteCode, user.uid);
-      const updatedIds = Array.from(new Set([...(user.teamIds || []), team.id]));
+      const updatedIds = Array.from(
+        new Set([...(user.teamIds || []), team.id])
+      );
 
       await updateForUser(user.uid, { teamIds: updatedIds });
       updateUser({ teamIds: updatedIds });
-      setTeams((prev) => [...prev, team]);
+      useUserStore
+        .getState()
+        .setTeams([...useUserStore.getState().teams, team]);
 
       toast.success("Joined team!");
       setInviteCode("");
@@ -80,28 +89,27 @@ const Teams = () => {
     <div className="max-w-4xl mx-auto p-6 mt-10 space-y-6">
       <h1 className="text-2xl font-bold mb-4">Teams</h1>
 
-     <div className="grid sm:grid-cols-2 gap-6">
-  <div
-    className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-md cursor-pointer hover:ring-2 ring-blue-500"
-    onClick={() => setShowCreateModal(true)}
-  >
-    <h2 className="text-xl font-semibold mb-2">Create a Team</h2>
-    <p className="text-sm text-gray-500 dark:text-gray-300">
-      Start a new team with a name and bio.
-    </p>
-  </div>
+      <div className="grid sm:grid-cols-2 gap-6">
+        <div
+          className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-md cursor-pointer hover:ring-2 ring-blue-500"
+          onClick={() => setShowCreateModal(true)}
+        >
+          <h2 className="text-xl font-semibold mb-2">Create a Team</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-300">
+            Start a new team with a name and bio.
+          </p>
+        </div>
 
-  <div
-    onClick={() => setShowJoinModal(true)}
-    className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-md cursor-pointer hover:ring-2 ring-green-500"
-  >
-    <h2 className="text-xl font-semibold mb-2">Join a Team</h2>
-    <p className="text-sm text-gray-500 dark:text-gray-300">
-      Enter an invite code to join an existing team.
-    </p>
-  </div>
-</div>
-
+        <div
+          onClick={() => setShowJoinModal(true)}
+          className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-md cursor-pointer hover:ring-2 ring-green-500"
+        >
+          <h2 className="text-xl font-semibold mb-2">Join a Team</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-300">
+            Enter an invite code to join an existing team.
+          </p>
+        </div>
+      </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {teams.map((team) => (
@@ -116,7 +124,9 @@ const Teams = () => {
                 Team
               </span>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{team.bio}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              {team.bio}
+            </p>
             <div className="text-xs text-gray-500 dark:text-gray-400">
               <span className="font-medium">Invite Code:</span>{" "}
               <code
