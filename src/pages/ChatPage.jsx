@@ -74,103 +74,110 @@ const ChatPage = () => {
   }
 
   return (
-    <div className="h-screen bg-zinc-900 text-white flex overflow-hidden">
-      <div className="w-full sm:w-1/4 bg-zinc-800 border-r border-zinc-700 p-4">
-        <h2 className="text-lg font-semibold mb-4">Teams</h2>
-        <ul className="space-y-2 overflow-y-auto max-h-[calc(100vh-5rem)]">
-          {teams.map((team) => (
-            <li
-              key={team.id}
-              onClick={() => setSelectedTeamId(team.id)}
-              className={`p-3 rounded cursor-pointer transition ${
-                team.id === selectedTeamId
-                  ? "bg-blue-600 text-white"
-                  : "bg-zinc-700 hover:bg-zinc-600 text-gray-200"
-              }`}
-            >
-              {team.name}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="flex flex-col flex-1 h-full">
-        {selectedTeam && (
-          <>
-            <div className="flex items-center p-4 bg-zinc-800 border-b border-zinc-700">
-              <button
-                className="sm:hidden mr-2"
-                onClick={() => setSelectedTeamId(null)}
+    <div className="h-screen bg-zinc-900 text-white flex flex-col sm:flex-row overflow-hidden">
+      {/* Teams Sidebar */}
+      {!selectedTeamId || window.innerWidth >= 640 ? (
+        <div className="w-full sm:w-1/4 bg-zinc-800 border-r border-zinc-700 p-4">
+          <h2 className="text-lg font-semibold mb-4">Teams</h2>
+          <ul className="space-y-2 overflow-y-auto max-h-[calc(100vh-5rem)]">
+            {teams.map((team) => (
+              <li
+                key={team.id}
+                onClick={() => setSelectedTeamId(team.id)}
+                className={`p-3 rounded cursor-pointer transition ${
+                  team.id === selectedTeamId
+                    ? "bg-blue-600 text-white"
+                    : "bg-zinc-700 hover:bg-zinc-600 text-gray-200"
+                }`}
               >
-                <ChevronLeft />
-              </button>
-              <h3 className="text-lg font-semibold">{selectedTeam.name}</h3>
-            </div>
+                {team.name}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4 bg-zinc-900">
-              {messages.length > 0 ? (
-                messages.map((msg,index) => {
-                  const isCurrentUser = msg.uid === user.uid;
-                  const previousMsg = messages[index - 1];
-                  const isSameSenderAsPrevious = previousMsg?.uid === msg.uid;
-                  return (
+      {/* Chat Section */}
+      {selectedTeamId && (
+        <div className="flex flex-col flex-1 h-full">
+          {/* Header */}
+          <div className="flex items-center p-4 bg-zinc-800 border-b border-zinc-700">
+            <button
+              className="sm:hidden mr-2"
+              onClick={() => setSelectedTeamId(null)}
+            >
+              <ChevronLeft />
+            </button>
+            <h3 className="text-lg font-semibold">{selectedTeam?.name}</h3>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4 bg-zinc-900">
+            {messages.length > 0 ? (
+              messages.map((msg, index) => {
+                const isCurrentUser = msg.uid === user.uid;
+                const previousMsg = messages[index - 1];
+                const isSameSenderAsPrevious =
+                  index > 0 && previousMsg?.uid === msg.uid;
+
+                return (
+                  <div
+                    key={msg.id}
+                    className={`max-w-[75%] ${
+                      isCurrentUser ? "ml-auto text-right" : "mr-auto"
+                    }`}
+                  >
+                    {!isCurrentUser && !isSameSenderAsPrevious && (
+                      <p className="text-xs text-gray-400 mb-1">
+                        {msg.sender}
+                      </p>
+                    )}
                     <div
-                      key={msg.id}
-                      className={`max-w-[75%] ${
-                        isCurrentUser ? "ml-auto text-right" : "mr-auto"
+                      className={`p-3 rounded-lg text-sm shadow break-words inline-block ${
+                        isCurrentUser
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-700 text-white"
                       }`}
                     >
-                      {!isCurrentUser && !isSameSenderAsPrevious && (
-                        <p className="text-xs text-gray-400 mb-1">
-                          {msg.sender}
-                        </p>
-                      )}
-                      <div
-                        className={`p-3 rounded-lg text-sm shadow break-words inline-block ${
-                          isCurrentUser
-                            ? "bg-blue-600 text-white"
-                            : "bg-zinc-700 text-white"
-                        }`}
-                      >
-                        {msg.text}
-                        <div className="text-[10px] mt-1 text-gray-300 text-right">
-                          {msg.createdAt?.seconds
-                            ? dayjs.unix(msg.createdAt.seconds).format("HH:mm")
-                            : "Sending..."}
-                        </div>
+                      {msg.text}
+                      <div className="text-[10px] mt-1 text-gray-300 text-right">
+                        {msg.createdAt?.seconds
+                          ? dayjs.unix(msg.createdAt.seconds).format("HH:mm")
+                          : "Sending..."}
                       </div>
                     </div>
-                  );
-                })
-              ) : (
-                <p className="text-gray-400 text-center italic">
-                  No messages yet.
-                </p>
-              )}
-              <div ref={messageEndRef} />
-            </div>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-gray-400 text-center italic">
+                No messages yet.
+              </p>
+            )}
+            <div ref={messageEndRef} />
+          </div>
 
-            <div className="p-4 border-t border-zinc-700 bg-zinc-800">
-              <div className="flex items-center gap-2">
-                <textarea
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Type a message..."
-                  rows={1}
-                  className="w-full p-2 rounded-md bg-zinc-700 text-white resize-none"
-                />
-                <button
-                  onClick={handleSend}
-                  className="p-2 rounded bg-blue-600 hover:bg-blue-700 transition"
-                >
-                  <Send className="w-6 h-6" />
-                </button>
-              </div>
+          {/* Input */}
+          <div className="p-4 border-t border-zinc-700 bg-zinc-800">
+            <div className="flex items-center gap-2">
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Type a message..."
+                rows={1}
+                className="w-full p-2 rounded-md bg-zinc-700 text-white resize-none"
+              />
+              <button
+                onClick={handleSend}
+                className="p-2 rounded bg-blue-600 hover:bg-blue-700 transition"
+              >
+                <Send className="w-6 h-6" />
+              </button>
             </div>
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
