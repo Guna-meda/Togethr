@@ -10,14 +10,13 @@ import { updateDoc, doc } from "firebase/firestore";
 import { db, auth } from "../firebase/firebaseConfig";
 import toast from "react-hot-toast";
 import { getRedirectResult } from "firebase/auth";
-import avatarImg from './avatar.png';
+import avatarImg from "./avatar.png";
 
 const Profile = () => {
   const user = useUserStore((s) => s.user);
   const updateUser = useUserStore((s) => s.updateUser);
   const setUser = useUserStore((state) => state.setUser);
-  const {authLoading } = useUserStore()
-
+  const [loading, setLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -81,6 +80,8 @@ const Profile = () => {
   //  }, []);
 
   useEffect(() => {
+    setLoading(true);
+
     if (user) {
       setFormData({
         name: user.name || "",
@@ -88,6 +89,7 @@ const Profile = () => {
         profession: user.profession || "",
       });
     }
+    setLoading(false);
   }, [user]);
 
   const handleChange = (e) => {
@@ -148,70 +150,74 @@ const Profile = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="text-center mt-10">
+        <div className="spinner mx-auto"></div>
+      </div>
+    );
+  }
 
-if (authLoading) {
-  return (
-    <div className="text-center mt-10">
-      <div className="spinner mx-auto"></div>
-    </div>
-  );
-}
-  
+  if (user === null) {
+    return (
+      <div className="flex justify-center mt-10 px-4">
+        <div className="w-full max-w-md bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg space-y-6">
+          <h2 className="text-2xl font-bold text-center">Welcome</h2>
+          <p className="text-sm text-center text-gray-500 dark:text-gray-400">
+            Please log in or sign up to access your profile.
+          </p>
 
-if (user === null) {
-  return (
-    <div className="flex justify-center mt-10 px-4">
-      <div className="w-full max-w-md bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-lg space-y-6">
-        <h2 className="text-2xl font-bold text-center">Welcome</h2>
-        <p className="text-sm text-center text-gray-500 dark:text-gray-400">
-          Please log in or sign up to access your profile.
-        </p>
+          <div className="space-y-4">
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={authForm.email}
+              onChange={(e) =>
+                setAuthForm({ ...authForm, email: e.target.value })
+              }
+              className="w-full p-2 border rounded-md bg-gray-50 dark:bg-zinc-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={authForm.password}
+              onChange={(e) =>
+                setAuthForm({ ...authForm, password: e.target.value })
+              }
+              className="w-full p-2 border rounded-md bg-gray-50 dark:bg-zinc-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+            <input
+              type="text"
+              name="name"
+              placeholder="Name (for sign up)"
+              value={authForm.name}
+              onChange={(e) =>
+                setAuthForm({ ...authForm, name: e.target.value })
+              }
+              className="w-full p-2 border rounded-md bg-gray-50 dark:bg-zinc-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
 
-        <div className="space-y-4">
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={authForm.email}
-            onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
-            className="w-full p-2 border rounded-md bg-gray-50 dark:bg-zinc-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={authForm.password}
-            onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
-            className="w-full p-2 border rounded-md bg-gray-50 dark:bg-zinc-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-          />
-          <input
-            type="text"
-            name="name"
-            placeholder="Name (for sign up)"
-            value={authForm.name}
-            onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
-            className="w-full p-2 border rounded-md bg-gray-50 dark:bg-zinc-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-          />
-        </div>
-
-        <div className="flex justify-between gap-4 mt-4">
-          <button
-            onClick={handleLogin}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg transition"
-          >
-            Login
-          </button>
-          <button
-            onClick={handleSignUp}
-            className="w-full bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg transition"
-          >
-            Sign Up
-          </button>
+          <div className="flex justify-between gap-4 mt-4">
+            <button
+              onClick={handleLogin}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg transition"
+            >
+              Login
+            </button>
+            <button
+              onClick={handleSignUp}
+              className="w-full bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg transition"
+            >
+              Sign Up
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   return (
     <div className="max-w-xl mx-auto mt-10 bg-white dark:bg-zinc-800 p-6 rounded-xl shadow-md">
@@ -278,7 +284,7 @@ if (user === null) {
                   handleSave();
                 }
               }}
-              className="bg-green-600 text-white px-4 py-2 rounded-md"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md"
             >
               Save
             </button>

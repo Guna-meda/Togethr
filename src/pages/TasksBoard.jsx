@@ -9,8 +9,8 @@ import {
   getPersonalTasks,
   updatePersonalTask,
 } from "../firebase/tasks";
-import { InlineEditTask } from "../components/InLine";
-import { Trash2 } from "lucide-react";
+import { Trash2, X } from "lucide-react";
+import dayjs from "dayjs";
 
 const TaskBoard = () => {
   const navigate = useNavigate();
@@ -26,7 +26,10 @@ const TaskBoard = () => {
   const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [status, setStatus] = useState("todo");
+  const [selectedPersonalTask, setSelectedPersonalTask] = useState(null);
+  const [editingPersonalTask, setEditingPersonalTask] = useState(null);
 
   const groupedTasks = {
     todo: tasks.filter((t) => t.status === "todo"),
@@ -74,19 +77,23 @@ const TaskBoard = () => {
 
     if (!title) {
       toast.error("Enter the title");
-      return
+      return;
     }
     const newTask = {
-      title: "New Task",
-      status: "todo",
+      title,
+      description,
+      status,
       createdAt: new Date(),
+       dueDate: dueDate ? new Date(dueDate) : null,
     };
+
     const added = await addPersonalTask(user.uid, newTask);
     setTasks((prev) => [...prev, added]);
     setTitle("");
     setDescription("");
     setStatus("todo");
-    setShowModal(false)
+    setShowModal(false);
+    setDueDate("");
   };
 
   const updateTask = async (id, updates) => {
@@ -101,6 +108,14 @@ const TaskBoard = () => {
     if (!user?.uid) return;
     await deletePersonalTask(user.uid, id);
     setTasks((prev) => prev.filter((task) => task.id !== id));
+  };
+
+  const getDueTagBgClass = (dueDate) => {
+    const daysLeft = dayjs(dueDate).diff(dayjs(), "day");
+    if (!dueDate) return "bg-gray-500";
+    if (daysLeft < 0) return "bg-red-500";
+    if (daysLeft <= 2) return "bg-orange-500";
+    return "bg-green-500";
   };
 
   return (
@@ -126,14 +141,22 @@ const TaskBoard = () => {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">My Tasks</h2>
             <div className="flex gap-2">
-              
               <div className="flex justify-center mt-8">
-                <button
-                  onClick={() => setShowModal(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow-sm"
-                >
-                  + Add Task
-                </button>
+                {user?.uid ? (
+                  <button
+                    onClick={() => setShowModal(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow-sm"
+                  >
+                    + Add Task
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => toast.error("Login to add tasks")}
+                    className="bg-gray-700 text-white px-6 py-2 rounded-md shadow-sm cursor-not-allowed"
+                  >
+                    + Add Task
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -151,33 +174,41 @@ const TaskBoard = () => {
                   {groupedTasks[status].length > 0 ? (
                     groupedTasks[status].map((task) => (
                       <li
-                      key={task.id}
-                      className="bg-zinc-700 text-white p-3 rounded-md shadow-sm transition-colors flex justify-between items-center"
-                    >
-                      <InlineEditTask
-                        task={task}
-                        onSave={(newTitle) =>
-                          updateTask(team.id, task.id, {
-                            title: newTitle,
-                          })
-                        }
-                      />
-
-                      <div className="flex gap-2 items-center">
-                        <button
-                          onClick={() => deleteTaskById(task.id)}
-                          className="text-red-500 hover:text-red-300"
-                          title="Delete"
+                        key={task.id}
+                        className="bg-zinc-700 text-white p-3 rounded-md shadow-sm transition-colors flex justify-between items-center"
+                      >
+                        <div
+                          onClick={() => {
+                            setSelectedPersonalTask(task);
+                            setEditingPersonalTask({ ...task });
+                          }}
+                          className="cursor-pointer flex-1"
                         >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </li>
+                          <div className="font-medium">{task.title}</div>
+                          {task.dueDate && (
+                            <span
+                              className={`text-xs mt-1 inline-block px-2 py-0.5 rounded-full text-white ${getDueTagBgClass(
+                                task.dueDate
+                              )}`}
+                            >
+                              Due: {dayjs(task.dueDate).format("MMM D")}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex gap-2 items-center">
+                          <button
+                            onClick={() => deleteTaskById(task.id)}
+                            className="text-red-500 hover:text-red-300"
+                            title="Delete"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </li>
                     ))
                   ) : (
-                    <li className="text-gray-400 italic text-sm">
-                          No tasks
-                        </li>
+                    <li className="text-gray-400 italic text-sm">No tasks</li>
                   )}
                 </ul>
               </div>
@@ -185,6 +216,107 @@ const TaskBoard = () => {
           </div>
         </section>
       )}
+
+      {selectedPersonalTask && editingPersonalTask && (
+  <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-zinc-900 text-white z-50 shadow-lg p-6 overflow-y-auto">
+    <div className="flex justify-between items-center mb-6">
+      <h3 className="text-xl font-semibold">Task Details</h3>
+      <button
+        onClick={() => setSelectedPersonalTask(null)}
+        className="text-gray-400 hover:text-white"
+      >
+        <X size={20} />
+      </button>
+    </div>
+
+    <div className="mb-4">
+      <label className="text-sm text-gray-400 block mb-1">Title</label>
+      <input
+        className="w-full p-2 rounded bg-zinc-800 border border-zinc-700"
+        value={editingPersonalTask.title}
+        onChange={(e) =>
+          setEditingPersonalTask({
+            ...editingPersonalTask,
+            title: e.target.value,
+          })
+        }
+      />
+    </div>
+
+    <div className="mb-4">
+      <label className="text-sm text-gray-400 block mb-1">Description</label>
+      <textarea
+        className="w-full p-2 rounded bg-zinc-800 border border-zinc-700"
+        rows={4}
+        value={editingPersonalTask.description || ""}
+        onChange={(e) =>
+          setEditingPersonalTask({
+            ...editingPersonalTask,
+            description: e.target.value,
+          })
+        }
+      />
+    </div>
+
+    <div className="mb-4">
+      <label className="text-sm text-gray-400 block mb-1">Due Date</label>
+      <input
+        type="date"
+        value={
+          editingPersonalTask.dueDate
+            ? dayjs(editingPersonalTask.dueDate).format("YYYY-MM-DD")
+            : ""
+        }
+        onChange={(e) =>
+          setEditingPersonalTask({
+            ...editingPersonalTask,
+            dueDate: e.target.value ? new Date(e.target.value) : null,
+          })
+        }
+        className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
+      />
+    </div>
+
+    <div className="mb-6">
+      <label className="text-sm text-gray-400 block mb-1">Status</label>
+      <select
+        className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
+        value={editingPersonalTask.status}
+        onChange={(e) =>
+          setEditingPersonalTask({
+            ...editingPersonalTask,
+            status: e.target.value,
+          })
+        }
+      >
+        <option value="todo">To Do</option>
+        <option value="in-progress">In Progress</option>
+        <option value="done">Done</option>
+      </select>
+    </div>
+    <div className="flex justify-between gap-4">
+      <button
+        onClick={() => {
+          deleteTaskById(selectedPersonalTask.id);
+          setSelectedPersonalTask(null);
+        }}
+        className="w-full text-red-500 hover:text-red-300 border border-red-500 rounded py-2"
+      >
+        Delete
+      </button>
+      <button
+        onClick={async () => {
+          await updateTask(editingPersonalTask.id, editingPersonalTask);
+          setSelectedPersonalTask(null);
+        }}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded py-2"
+      >
+        Save
+      </button>
+    </div>
+  </div>
+)}
+
 
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -212,6 +344,13 @@ const TaskBoard = () => {
               <option value="in-progress">In Progress</option>
               <option value="done">Done</option>
             </select>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="w-full p-2 border rounded-md dark:bg-zinc-700 dark:text-white"
+            />
+
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowModal(false)}

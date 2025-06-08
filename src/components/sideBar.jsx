@@ -1,3 +1,4 @@
+// src/components/Sidebar.jsx
 import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import {
@@ -10,10 +11,12 @@ import {
   Sun,
   Users,
 } from "lucide-react";
+import { useTheme } from "../hooks/ThemeContext"; // Import the useTheme hook
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const { theme, toggleTheme } = useTheme(); // Use context for theme state
 
   const navItems = [
     { name: "home", icon: <LayoutDashboard />, path: "/" },
@@ -21,24 +24,6 @@ const Sidebar = () => {
     { name: "tasks", icon: <ClipboardList />, path: "/TasksBoard" },
     { name: "chat", icon: <MessageCircleMore />, path: "/ChatPage" },
   ];
-
-  const [isDark, setIsDark] = useState(
-    localStorage.theme === "dark" ||
-      (!("theme" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
-  );
-
-  const toggleTheme = () => {
-    if (isDark) {
-      document.documentElement.classList.remove("dark");
-      localStorage.theme = "light";
-      setIsDark(false);
-    } else {
-      document.documentElement.classList.add("dark");
-      localStorage.theme = "dark";
-      setIsDark(true);
-    }
-  };
 
   return (
     <>
@@ -109,7 +94,7 @@ const Sidebar = () => {
               onClick={toggleTheme}
               className="flex items-center gap-2 px-4 py-2 bg-zinc-200 dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl hover:opacity-80"
             >
-              {isDark ? <Sun size={18} /> : <Moon size={18} />}
+              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
             </button>
           </div>
         </nav>

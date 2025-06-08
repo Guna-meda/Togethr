@@ -75,7 +75,6 @@ const ChatPage = () => {
 
   return (
     <div className="h-screen bg-zinc-900 text-white flex flex-col sm:flex-row overflow-hidden">
-      {/* Teams Sidebar */}
       {!selectedTeamId || window.innerWidth >= 640 ? (
         <div className="w-full sm:w-1/4 bg-zinc-800 border-r border-zinc-700 p-4">
           <h2 className="text-lg font-semibold mb-4">Teams</h2>
@@ -97,10 +96,8 @@ const ChatPage = () => {
         </div>
       ) : null}
 
-      {/* Chat Section */}
       {selectedTeamId && (
         <div className="flex flex-col flex-1 h-full">
-          {/* Header */}
           <div className="flex items-center p-4 bg-zinc-800 border-b border-zinc-700">
             <button
               className="sm:hidden mr-2"
@@ -111,7 +108,6 @@ const ChatPage = () => {
             <h3 className="text-lg font-semibold">{selectedTeam?.name}</h3>
           </div>
 
-          {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4 bg-zinc-900">
             {messages.length > 0 ? (
               messages.map((msg, index) => {

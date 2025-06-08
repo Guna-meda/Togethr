@@ -97,7 +97,7 @@ const TeamPage = ({ team, teamId }) => {
   return (
     <div className="max-w-7xl mx-auto px-6 py-10 text-gray-100">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-white">{teamData?.name}</h1>
+        <h1 className="text-4xl font-bold text-blue-500 ">{teamData?.name}</h1>
         <p className="text-gray-400 mt-2 text-base">{teamData?.bio}</p>
       </div>
 

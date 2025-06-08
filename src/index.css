@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 .spinner {
   border: 4px solid rgba(255, 255, 255, 0.3);

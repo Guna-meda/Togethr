@@ -87,7 +87,7 @@ const Teams = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 mt-10 space-y-6">
-      <h1 className="text-2xl font-bold mb-4">Teams</h1>
+      <h1 className="text-2xl text-blue-500 font-bold mb-4">Teams</h1>
 
       <div className="grid sm:grid-cols-2 gap-6">
         <div
@@ -102,7 +102,7 @@ const Teams = () => {
 
         <div
           onClick={() => setShowJoinModal(true)}
-          className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-md cursor-pointer hover:ring-2 ring-green-500"
+          className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-md cursor-pointer hover:ring-2 ring-blue-500"
         >
           <h2 className="text-xl font-semibold mb-2">Join a Team</h2>
           <p className="text-sm text-gray-500 dark:text-gray-300">
