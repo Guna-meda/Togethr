@@ -19,7 +19,6 @@ const Sidebar = () => {
   const { theme, toggleTheme } = useTheme(); // Use context for theme state
 
   const navItems = [
-    { name: "home", icon: <LayoutDashboard />, path: "/" },
     { name: "teams", icon: <Users />, path: "/Teams" },
     { name: "tasks", icon: <ClipboardList />, path: "/TasksBoard" },
     { name: "chat", icon: <MessageCircleMore />, path: "/ChatPage" },

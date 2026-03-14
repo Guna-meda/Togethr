@@ -1,5 +1,5 @@
 import React, { useEffect,useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Sidebar from "./components/sideBar";
 import Dashboard from "./pages/Dashboard";
 import TasksBoard from "./pages/TasksBoard";
@@ -46,7 +46,7 @@ const App = () => {
       <Sidebar />
       <div className="flex-grow p-4 md:p-6 overflow-y-auto text-gray-900 dark:text-gray-100">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+  <Route path="/" element={<Navigate to="/Teams" replace />} />
           <Route path="/TasksBoard" element={<TasksBoard />} />
           <Route path="/Profile" element={<Profile />} />
           <Route path="/ChatPage" element={<ChatPage />} />
