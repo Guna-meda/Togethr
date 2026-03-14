@@ -6,11 +6,11 @@ import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from "./hooks/ThemeContext.jsx";
 
 createRoot(document.getElementById('root')).render(
-  <BrowserRouter basename="/Togethr">
-  <StrictMode>
-  <ThemeProvider>
-      <App />
-    </ThemeProvider>
-  </StrictMode>
-  </BrowserRouter>,
+  <BrowserRouter>
+    <StrictMode>
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    </StrictMode>
+  </BrowserRouter>
 )
